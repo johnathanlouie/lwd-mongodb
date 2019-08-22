@@ -34,7 +34,7 @@ database.findOne = function (collection, query, project, callback) {
     connect().then(a, fail);
 };
 
-database.find = function (collection, query, project, callback) {
+database.findMany = function (collection, query, project, callback) {
 
     function a1(client) {
 
