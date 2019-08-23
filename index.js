@@ -3,7 +3,7 @@
 const MongoClient = require("mongodb").MongoClient;
 
 function connect() {
-    return Promise.resolve(MongoClient.connect(database.config.url));
+    return MongoClient.connect(database.config.url);
 }
 
 var database = {};
@@ -12,101 +12,87 @@ database.setConfig = function (config) {
     database.config = config;
 };
 
-database.findOne = function (collection, callback, query, projection) {
+database.findOne = function (collection, query, projection) {
+    var findOneOptions = {projection: projection};
 
-    function fail(error) {
-        callback(error);
+    function a(client) {
+
+        function b(document) {
+
+            function c(value) {
+                return document;
+            }
+
+            return client.close().then(c);
+        }
+
+        return client.db().collection(collection).findOne(query, findOneOptions).then(b);
     }
+
+    return connect().then(a);
+};
+
+database.findMany = function (collection, query, projection) {
+    var findOptions = {projection: projection};
+
+    function a(client) {
+        var cursor = client.db().collection(collection).find(query, findOptions);
+
+        function b(documents) {
+
+            function d(value) {
+                return documents;
+            }
+
+            function c() {
+                client.close();
+            }
+
+            return cursor.close().then(c).then(d);
+        }
+
+        return cursor.toArray().then(b);
+    }
+
+    return connect().then(a);
+};
+
+database.insertOne = function (collection, data) {
 
     function a(client) {
 
         function b(result) {
-            callback(undefined, result);
-        }
 
-        function c() {
-            client.close();
-        }
-
-        return client.db().collection(collection).findOne(query, {projection: projection}).then(b).catch(fail).then(c);
-    }
-
-    connect().then(a, fail);
-};
-
-database.findMany = function (collection, callback, query, projection) {
-
-    function a1(client) {
-
-        function b(error, documents) {
-            if (error) {
-                callback(error);
-            } else {
-                callback(undefined, documents);
+            function c(value) {
+                return result;
             }
-            client.close();
+
+            return client.close().then(c);
         }
 
-        client.db().collection(collection).find(query).project(projection).toArray(b);
+        return client.db().collection(collection).insertOne(data).then(b);
     }
 
-    function a2(error) {
-        callback(error);
-    }
-
-    connect().then(a1, a2);
+    return connect().then(a);
 };
 
-database.insertOne = function (collection, callback, data) {
+database.insertMany = function (collection, data) {
 
-    function a1(client) {
+    function a(client) {
 
-        function b1(result) {
-            callback(undefined, result);
+        function b(result) {
+
+            function c(value) {
+                return result;
+            }
+
+            return client.close().then(c);
         }
 
-        function b2(error) {
-            callback(error);
-        }
-
-        function c() {
-            return client.close();
-        }
-
-        return client.db().collection(collection).insertOne(data).then(b1, b2).then(c);
+        return client.db().collection(collection).insertMany(data).then(b);
     }
 
-    function a2(error) {
-        callback(error);
-    }
-
-    connect().then(a1, a2);
-};
-
-database.insertMany = function (collection, callback, data) {
-
-    function a1(client) {
-
-        function b1(result) {
-            callback(undefined, result);
-        }
-
-        function b2(error) {
-            callback(error);
-        }
-
-        function c() {
-            return client.close();
-        }
-
-        return client.db().collection(collection).insertMany(data).then(b1, b2).then(c);
-    }
-
-    function a2(error) {
-        callback(error);
-    }
-
-    connect().then(a1, a2);
+    return connect().then(a);
 };
 
 module.exports = database;
