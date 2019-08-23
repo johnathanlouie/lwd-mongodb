@@ -12,7 +12,7 @@ database.setConfig = function (config) {
     database.config = config;
 };
 
-database.findOne = function (collection, query, project, callback) {
+database.findOne = function (collection, callback, query, projection) {
 
     function fail(error) {
         callback(error);
@@ -28,13 +28,13 @@ database.findOne = function (collection, query, project, callback) {
             client.close();
         }
 
-        return client.db().collection(collection).findOne(query, {projection: project}).then(b).catch(fail).then(c);
+        return client.db().collection(collection).findOne(query, {projection: projection}).then(b).catch(fail).then(c);
     }
 
     connect().then(a, fail);
 };
 
-database.findMany = function (collection, query, project, callback) {
+database.findMany = function (collection, callback, query, projection) {
 
     function a1(client) {
 
@@ -47,7 +47,7 @@ database.findMany = function (collection, query, project, callback) {
             client.close();
         }
 
-        client.db().collection(collection).find(query).project(project).toArray(b);
+        client.db().collection(collection).find(query).project(projection).toArray(b);
     }
 
     function a2(error) {
@@ -57,7 +57,7 @@ database.findMany = function (collection, query, project, callback) {
     connect().then(a1, a2);
 };
 
-database.insertOne = function (collection, data, callback) {
+database.insertOne = function (collection, callback, data) {
 
     function a1(client) {
 
@@ -83,7 +83,7 @@ database.insertOne = function (collection, data, callback) {
     connect().then(a1, a2);
 };
 
-database.insertMany = function (collection, data, callback) {
+database.insertMany = function (collection, callback, data) {
 
     function a1(client) {
 
