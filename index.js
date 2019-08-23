@@ -95,4 +95,23 @@ database.insertMany = function (collection, data) {
     return connect().then(a);
 };
 
+database.deleteOne = function (collection, filter) {
+
+    function a(client) {
+
+        function b(result) {
+
+            function c(value) {
+                return result;
+            }
+
+            return client.close().then(c);
+        }
+
+        return client.db().collection(collection).deleteOne(filter).then(b);
+    }
+
+    return connect().then(a);
+};
+
 module.exports = database;
