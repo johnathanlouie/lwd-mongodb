@@ -1,15 +1,30 @@
 /* global Promise */
 
-const MongoClient = require("mongodb").MongoClient;
+const mongodb = require("mongodb");
+const MongoClient = mongodb.MongoClient;
 
 function connect() {
     return MongoClient.connect(database.config.url);
 }
 
+var IdFilter = {};
+
+IdFilter.fromHexString = function (hex) {
+    return {_id: mongodb.ObjectId.createFromHexString(hex)};
+};
+
+IdFilter.fromDocument = function (document) {
+    return IdFilter.fromHexString(document._id);
+};
+
 var database = {};
 
 database.setConfig = function (config) {
     database.config = config;
+};
+
+database.getDocumentById = function (collection, id, projection) {
+    return database.findOne(collection, IdFilter.fromHexString(id), projection);
 };
 
 database.findOne = function (collection, query, projection) {
@@ -109,6 +124,26 @@ database.deleteOne = function (collection, filter) {
         }
 
         return client.db().collection(collection).deleteOne(filter).then(b);
+    }
+
+    return connect().then(a);
+};
+
+database.replaceOne = function (collection, document) {
+
+    function a(client) {
+
+        function b(result) {
+
+            function c(value) {
+                return result;
+            }
+
+            return client.close().then(c);
+        }
+
+        var filter = IdFilter.fromDocument(document);
+        return client.db().collection(collection).replaceOne(filter, document).then(b);
     }
 
     return connect().then(a);
