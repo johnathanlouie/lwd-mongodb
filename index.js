@@ -4,7 +4,7 @@ const mongodb = require("mongodb");
 const MongoClient = mongodb.MongoClient;
 
 function connect() {
-    return MongoClient.connect(database.config.url);
+    return MongoClient.connect(database.config.url, {useNewUrlParser: true});
 }
 
 var IdFilter = {};
