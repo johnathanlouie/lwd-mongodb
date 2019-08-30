@@ -33,10 +33,6 @@ database.setConfig = function (config) {
     database.config = config;
 };
 
-database.getDocumentById = function (collection, id, projection) {
-    return database.findOne(collection, IdFilter.fromHexString(id), projection);
-};
-
 database.findOne = function (collection, query, projection) {
     var findOneOptions = {projection: projection};
 
@@ -158,6 +154,14 @@ database.replaceOne = function (collection, document) {
     }
 
     return connect().then(a);
+};
+
+database.getById = function (collection, id, projection) {
+    return database.findOne(collection, IdFilter.fromHexString(id), projection);
+};
+
+database.deleteById = function (collection, id) {
+    return database.deleteOne(collection, IdFilter.fromHexString(id));
 };
 
 module.exports = database;
