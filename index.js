@@ -11,6 +11,12 @@ function connect() {
     return MongoClient.connect(database.config.url, options);
 }
 
+function cloneNoId(document) {
+    var newDoc = Object.assign({}, document);
+    delete newDoc._id;
+    return newDoc;
+}
+
 var IdFilter = {};
 
 IdFilter.fromHexString = function (hex) {
@@ -147,7 +153,8 @@ database.replaceOne = function (collection, document) {
         }
 
         var filter = IdFilter.fromDocument(document);
-        return client.db().collection(collection).replaceOne(filter, document).then(b);
+        var noId = cloneNoId(document);
+        return client.db().collection(collection).replaceOne(filter, noId).then(b);
     }
 
     return connect().then(a);
