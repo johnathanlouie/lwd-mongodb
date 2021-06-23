@@ -48,69 +48,29 @@ class Database {
   }
 
   static async findOne(collection, query, projection) {
-    try {
-      let findOneOptions = { projection: projection };
-      var client = await Database.connect();
-      let result = await client.db().collection(collection).findOne(query, findOneOptions);
-      return result;
-    } finally {
-      client.close();
-    }
+    return await Database.#db.collection(collection).findOne(query, { projection: projection });
   }
 
   static async findMany(collection, query, projection) {
-    try {
-      let findOptions = { projection: projection };
-      var client = await Database.connect();
-      var cursor = client.db().collection(collection).find(query, findOptions);
-      let documents = await cursor.toArray();
-      return documents;
-    } finally {
-      cursor.close();
-      client.close();
-    }
+    return await Database.#db.collection(collection).find(query, { projection: projection }).toArray();
   }
 
   static async insertOne(collection, data) {
-    try {
-      var client = await Database.connect();
-      let result = await client.db().collection(collection).insertOne(data);
-      return result;
-    } finally {
-      client.close();
-    }
+    return await Database.#db.collection(collection).insertOne(data);
   }
 
   static async insertMany(collection, data) {
-    try {
-      var client = await Database.connect();
-      let result = await client.db().collection(collection).insertMany(data);
-      return result;
-    } finally {
-      client.close();
-    }
+    return await Database.#db.collection(collection).insertMany(data);
   }
 
   static async deleteOne(collection, filter) {
-    try {
-      var client = await Database.connect();
-      let result = await client.db().collection(collection).deleteOne(filter);
-      return result;
-    } finally {
-      client.close();
-    }
+    return await Database.#db.collection(collection).deleteOne(filter);
   }
 
   static async replaceOne(collection, document) {
-    try {
-      var client = await Database.connect();
-      let filter = IdFilter.fromDocument(document);
-      let noId = cloneNoId(document);
-      let result = await client.db().collection(collection).replaceOne(filter, noId);
-      return result;
-    } finally {
-      client.close();
-    }
+    let filter = IdFilter.fromDocument(document);
+    let noId = cloneNoId(document);
+    return await Database.#db.collection(collection).replaceOne(filter, noId);
   }
 
   static getById(collection, id, projection) {
