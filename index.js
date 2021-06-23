@@ -8,7 +8,7 @@ function connect() {
         useNewUrlParser: true,
         useUnifiedTopology: true
     };
-    return MongoClient.connect(database.config.url, options);
+    return MongoClient.connect(Database.config.url, options);
 }
 
 function cloneNoId(document) {
@@ -20,148 +20,151 @@ function cloneNoId(document) {
 var IdFilter = {};
 
 IdFilter.fromHexString = function (hex) {
-    return {_id: mongodb.ObjectId.createFromHexString(hex)};
+    return { _id: mongodb.ObjectId.createFromHexString(hex) };
 };
 
 IdFilter.fromDocument = function (document) {
     return IdFilter.fromHexString(document._id);
 };
 
-var database = {};
+class Database {
 
-database.setConfig = function (config) {
-    database.config = config;
-};
+    static config;
 
-database.findOne = function (collection, query, projection) {
-    var findOneOptions = {projection: projection};
-
-    function a(client) {
-
-        function b(document) {
-
-            function c(value) {
-                return document;
-            }
-
-            return client.close().then(c);
-        }
-
-        return client.db().collection(collection).findOne(query, findOneOptions).then(b);
+    static setConfig(config) {
+        Database.config = config;
     }
 
-    return connect().then(a);
-};
+    static findOne(collection, query, projection) {
+        var findOneOptions = { projection: projection };
 
-database.findMany = function (collection, query, projection) {
-    var findOptions = {projection: projection};
+        function a(client) {
 
-    function a(client) {
-        var cursor = client.db().collection(collection).find(query, findOptions);
+            function b(document) {
 
-        function b(documents) {
+                function c(value) {
+                    return document;
+                }
 
-            function d(value) {
-                return documents;
+                return client.close().then(c);
             }
 
-            function c() {
-                client.close();
-            }
-
-            return cursor.close().then(c).then(d);
+            return client.db().collection(collection).findOne(query, findOneOptions).then(b);
         }
 
-        return cursor.toArray().then(b);
+        return connect().then(a);
     }
 
-    return connect().then(a);
-};
+    static findMany(collection, query, projection) {
+        var findOptions = { projection: projection };
 
-database.insertOne = function (collection, data) {
+        function a(client) {
+            var cursor = client.db().collection(collection).find(query, findOptions);
 
-    function a(client) {
+            function b(documents) {
 
-        function b(result) {
+                function d(value) {
+                    return documents;
+                }
 
-            function c(value) {
-                return result;
+                function c() {
+                    client.close();
+                }
+
+                return cursor.close().then(c).then(d);
             }
 
-            return client.close().then(c);
+            return cursor.toArray().then(b);
         }
 
-        return client.db().collection(collection).insertOne(data).then(b);
+        return connect().then(a);
     }
 
-    return connect().then(a);
-};
+    static insertOne(collection, data) {
 
-database.insertMany = function (collection, data) {
+        function a(client) {
 
-    function a(client) {
+            function b(result) {
 
-        function b(result) {
+                function c(value) {
+                    return result;
+                }
 
-            function c(value) {
-                return result;
+                return client.close().then(c);
             }
 
-            return client.close().then(c);
+            return client.db().collection(collection).insertOne(data).then(b);
         }
 
-        return client.db().collection(collection).insertMany(data).then(b);
+        return connect().then(a);
     }
 
-    return connect().then(a);
-};
+    static insertMany(collection, data) {
 
-database.deleteOne = function (collection, filter) {
+        function a(client) {
 
-    function a(client) {
+            function b(result) {
 
-        function b(result) {
+                function c(value) {
+                    return result;
+                }
 
-            function c(value) {
-                return result;
+                return client.close().then(c);
             }
 
-            return client.close().then(c);
+            return client.db().collection(collection).insertMany(data).then(b);
         }
 
-        return client.db().collection(collection).deleteOne(filter).then(b);
+        return connect().then(a);
     }
 
-    return connect().then(a);
-};
+    static deleteOne(collection, filter) {
 
-database.replaceOne = function (collection, document) {
+        function a(client) {
 
-    function a(client) {
+            function b(result) {
 
-        function b(result) {
+                function c(value) {
+                    return result;
+                }
 
-            function c(value) {
-                return result;
+                return client.close().then(c);
             }
 
-            return client.close().then(c);
+            return client.db().collection(collection).deleteOne(filter).then(b);
         }
 
-        var filter = IdFilter.fromDocument(document);
-        var noId = cloneNoId(document);
-        return client.db().collection(collection).replaceOne(filter, noId).then(b);
+        return connect().then(a);
     }
 
-    return connect().then(a);
-};
+    static replaceOne(collection, document) {
 
-database.getById = function (collection, id, projection) {
-    return database.findOne(collection, IdFilter.fromHexString(id), projection);
-};
+        function a(client) {
 
-database.deleteById = function (collection, id) {
-    return database.deleteOne(collection, IdFilter.fromHexString(id));
-};
+            function b(result) {
 
-module.exports = database;
+                function c(value) {
+                    return result;
+                }
+
+                return client.close().then(c);
+            }
+
+            var filter = IdFilter.fromDocument(document);
+            var noId = cloneNoId(document);
+            return client.db().collection(collection).replaceOne(filter, noId).then(b);
+        }
+
+        return connect().then(a);
+    }
+
+    static getById(collection, id, projection) {
+        return Database.findOne(collection, IdFilter.fromHexString(id), projection);
+    }
+
+    static deleteById(collection, id) {
+        return Database.deleteOne(collection, IdFilter.fromHexString(id));
+    }
+}
+
+module.exports = Database;
