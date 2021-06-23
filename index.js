@@ -1,15 +1,14 @@
 /* global Promise */
 
-const mongodb = require("mongodb");
+const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 
 
 function connect() {
-    var options = {
+    return MongoClient.connect(Database.config.url, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
-    };
-    return MongoClient.connect(Database.config.url, options);
+        useUnifiedTopology: true,
+    });
 }
 
 
@@ -20,17 +19,18 @@ function cloneNoId(document) {
 }
 
 
-var IdFilter = {};
+class IdFilter {
+
+    static fromHexString(hex) {
+        return { _id: mongodb.ObjectId.createFromHexString(hex) };
+    }
 
 
-IdFilter.fromHexString = function (hex) {
-    return { _id: mongodb.ObjectId.createFromHexString(hex) };
-};
+    static fromDocument(document) {
+        return IdFilter.fromHexString(document._id);
+    }
 
-
-IdFilter.fromDocument = function (document) {
-    return IdFilter.fromHexString(document._id);
-};
+}
 
 
 class Database {
@@ -171,6 +171,7 @@ class Database {
     static deleteById(collection, id) {
         return Database.deleteOne(collection, IdFilter.fromHexString(id));
     }
+
 }
 
 
