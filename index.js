@@ -4,8 +4,8 @@ const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 
 
-function connect() {
-  return MongoClient.connect(Database.config.url, {
+async function connect() {
+  return await MongoClient.connect(Database.config.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -40,127 +40,70 @@ class Database {
     Database.config = config;
   }
 
-  static findOne(collection, query, projection) {
-    var findOneOptions = { projection: projection };
-
-    function a(client) {
-
-      function b(document) {
-
-        function c(value) {
-          return document;
-        }
-
-        return client.close().then(c);
-      }
-
-      return client.db().collection(collection).findOne(query, findOneOptions).then(b);
+  static async findOne(collection, query, projection) {
+    try {
+      let findOneOptions = { projection: projection };
+      var client = await connect();
+      let result = await client.db().collection(collection).findOne(query, findOneOptions);
+      return result;
+    } finally {
+      client.close();
     }
-
-    return connect().then(a);
   }
 
-  static findMany(collection, query, projection) {
-    var findOptions = { projection: projection };
-
-    function a(client) {
+  static async findMany(collection, query, projection) {
+    try {
+      let findOptions = { projection: projection };
+      var client = await connect();
       var cursor = client.db().collection(collection).find(query, findOptions);
-
-      function b(documents) {
-
-        function d(value) {
-          return documents;
-        }
-
-        function c() {
-          client.close();
-        }
-
-        return cursor.close().then(c).then(d);
-      }
-
-      return cursor.toArray().then(b);
+      let documents = await cursor.toArray();
+      return documents;
+    } finally {
+      cursor.close();
+      client.close();
     }
-
-    return connect().then(a);
   }
 
-  static insertOne(collection, data) {
-
-    function a(client) {
-
-      function b(result) {
-
-        function c(value) {
-          return result;
-        }
-
-        return client.close().then(c);
-      }
-
-      return client.db().collection(collection).insertOne(data).then(b);
+  static async insertOne(collection, data) {
+    try {
+      var client = await connect();
+      let result = await client.db().collection(collection).insertOne(data);
+      return result;
+    } finally {
+      client.close();
     }
-
-    return connect().then(a);
   }
 
-  static insertMany(collection, data) {
-
-    function a(client) {
-
-      function b(result) {
-
-        function c(value) {
-          return result;
-        }
-
-        return client.close().then(c);
-      }
-
-      return client.db().collection(collection).insertMany(data).then(b);
+  static async insertMany(collection, data) {
+    try {
+      var client = await connect();
+      let result = await client.db().collection(collection).insertMany(data);
+      return result;
+    } finally {
+      client.close();
     }
-
-    return connect().then(a);
   }
 
-  static deleteOne(collection, filter) {
-
-    function a(client) {
-
-      function b(result) {
-
-        function c(value) {
-          return result;
-        }
-
-        return client.close().then(c);
-      }
-
-      return client.db().collection(collection).deleteOne(filter).then(b);
+  static async deleteOne(collection, filter) {
+    try {
+      var client = await connect();
+      let result = await client.db().collection(collection).deleteOne(filter);
+      return result;
+    } finally {
+      client.close();
     }
-
-    return connect().then(a);
   }
 
-  static replaceOne(collection, document) {
-
-    function a(client) {
-
-      function b(result) {
-
-        function c(value) {
-          return result;
-        }
-
-        return client.close().then(c);
-      }
-
-      var filter = IdFilter.fromDocument(document);
-      var noId = cloneNoId(document);
-      return client.db().collection(collection).replaceOne(filter, noId).then(b);
+  static async replaceOne(collection, document) {
+    try {
+      var client = await connect();
+      let filter = IdFilter.fromDocument(document);
+      let noId = cloneNoId(document);
+      let result = await client.db().collection(collection).replaceOne(filter, noId);
+      return result;
+    } finally {
+      client.close();
     }
-
-    return connect().then(a);
   }
 
   static getById(collection, id, projection) {
