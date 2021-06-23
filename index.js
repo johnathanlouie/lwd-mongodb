@@ -3,6 +3,7 @@
 const mongodb = require("mongodb");
 const MongoClient = mongodb.MongoClient;
 
+
 function connect() {
     var options = {
         useNewUrlParser: true,
@@ -11,21 +12,26 @@ function connect() {
     return MongoClient.connect(Database.config.url, options);
 }
 
+
 function cloneNoId(document) {
     var newDoc = Object.assign({}, document);
     delete newDoc._id;
     return newDoc;
 }
 
+
 var IdFilter = {};
+
 
 IdFilter.fromHexString = function (hex) {
     return { _id: mongodb.ObjectId.createFromHexString(hex) };
 };
 
+
 IdFilter.fromDocument = function (document) {
     return IdFilter.fromHexString(document._id);
 };
+
 
 class Database {
 
@@ -166,5 +172,6 @@ class Database {
         return Database.deleteOne(collection, IdFilter.fromHexString(id));
     }
 }
+
 
 module.exports = Database;
