@@ -23,17 +23,28 @@ class IdFilter {
 
 class Database {
 
-  static config;
+  static #config = null;
+  static #client = null;
+  static #db = null;
 
   static setConfig(config) {
-    Database.config = config;
+    Database.#config = config;
   }
 
   static async connect() {
-    return await mongodb.MongoClient.connect(Database.config.url, {
+    Database.#client = await mongodb.MongoClient.connect(Database.#config.url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    Database.#db = Database.#client.db();
+  }
+
+  static async close() {
+    if (Database.#client !== null) {
+      await Database.#client.close();
+      Database.#client = null;
+      Database.#db = null;
+    }
   }
 
   static async findOne(collection, query, projection) {
