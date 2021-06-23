@@ -1,15 +1,4 @@
-/* global Promise */
-
 const mongodb = require('mongodb');
-const MongoClient = mongodb.MongoClient;
-
-
-async function connect() {
-  return await MongoClient.connect(Database.config.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-}
 
 
 function cloneNoId(document) {
@@ -40,10 +29,17 @@ class Database {
     Database.config = config;
   }
 
+  static async connect() {
+    return await mongodb.MongoClient.connect(Database.config.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  }
+
   static async findOne(collection, query, projection) {
     try {
       let findOneOptions = { projection: projection };
-      var client = await connect();
+      var client = await Database.connect();
       let result = await client.db().collection(collection).findOne(query, findOneOptions);
       return result;
     } finally {
@@ -54,7 +50,7 @@ class Database {
   static async findMany(collection, query, projection) {
     try {
       let findOptions = { projection: projection };
-      var client = await connect();
+      var client = await Database.connect();
       var cursor = client.db().collection(collection).find(query, findOptions);
       let documents = await cursor.toArray();
       return documents;
@@ -66,7 +62,7 @@ class Database {
 
   static async insertOne(collection, data) {
     try {
-      var client = await connect();
+      var client = await Database.connect();
       let result = await client.db().collection(collection).insertOne(data);
       return result;
     } finally {
@@ -76,7 +72,7 @@ class Database {
 
   static async insertMany(collection, data) {
     try {
-      var client = await connect();
+      var client = await Database.connect();
       let result = await client.db().collection(collection).insertMany(data);
       return result;
     } finally {
@@ -86,7 +82,7 @@ class Database {
 
   static async deleteOne(collection, filter) {
     try {
-      var client = await connect();
+      var client = await Database.connect();
       let result = await client.db().collection(collection).deleteOne(filter);
       return result;
     } finally {
@@ -96,7 +92,7 @@ class Database {
 
   static async replaceOne(collection, document) {
     try {
-      var client = await connect();
+      var client = await Database.connect();
       let filter = IdFilter.fromDocument(document);
       let noId = cloneNoId(document);
       let result = await client.db().collection(collection).replaceOne(filter, noId);
