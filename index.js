@@ -29,10 +29,11 @@ class IdFilter {
 
 /**
  * @typedef {Object} MongodbConfig
- * @property {string} username
- * @property {string} password
+ * @property {?string} username
+ * @property {?string} password
  * @property {string} hostname
- * @property {number} port
+ * @property {?number} port
+ * @property {string} database
  */
 
 
@@ -42,6 +43,7 @@ class MongodbUrl {
   #password;
   #hostname;
   #port;
+  #database;
 
   /**
    * 
@@ -52,6 +54,7 @@ class MongodbUrl {
     this.#password = config.password;
     this.#hostname = config.hostname;
     this.#port = config.port;
+    this.#database = config.database;
   }
 
   #credentialsUrl() {
@@ -72,7 +75,7 @@ class MongodbUrl {
   }
 
   #url() {
-    return `${this.#credentialsUrl()}${this.#hostname}${this.#portUrl()}`;
+    return `${this.#credentialsUrl()}${this.#hostname}${this.#portUrl()}/${this.#database}`;
   }
 
   standardUrl() {
