@@ -1,3 +1,4 @@
+const fs = require('fs');
 const mongodb = require('mongodb');
 
 
@@ -25,10 +26,64 @@ class IdFilter {
 
 }
 
+
 /**
  * @typedef {Object} MongodbConfig
- * @property {string} url
+ * @property {string} username
+ * @property {string} password
+ * @property {string} hostname
+ * @property {number} port
  */
+
+
+class MongodbUrl {
+
+  #username;
+  #password;
+  #hostname;
+  #port;
+
+  /**
+   * 
+   * @param {MongodbConfig} config 
+   */
+  constructor(config) {
+    this.#username = config.username;
+    this.#password = config.password;
+    this.#hostname = config.hostname;
+    this.#port = config.port;
+  }
+
+  #credentialsUrl() {
+    if (this.#username && this.#password) {
+      return `${this.#username}:${this.#password}@`;
+    } else if (this.#username) {
+      return `${this.#username}@`;
+    } else {
+      return '';
+    }
+  }
+
+  #portUrl() {
+    if (this.#port) {
+      return `:${this.#port}`;
+    }
+    return '';
+  }
+
+  #url() {
+    return `${this.#credentialsUrl()}${this.#hostname}${this.#portUrl()}`;
+  }
+
+  standardUrl() {
+    return `mongodb://${this.#url()}`;
+  }
+
+  dnsSrvUrl() {
+    return `mongodb+srv://${this.#url()}`;
+  }
+
+}
 
 
 class Database {
@@ -50,8 +105,16 @@ class Database {
     Database.#config = config;
   }
 
+  /**
+   * 
+   * @param {string} filepath 
+   */
+  static readConfig(filepath) {
+    Database.#config = JSON.parse(fs.readFileSync(filepath));
+  }
+
   static async connect() {
-    Database.#client = await mongodb.MongoClient.connect(Database.#config.url, {
+    Database.#client = await mongodb.MongoClient.connect(new MongodbUrl(Database.#config).standardUrl(), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
