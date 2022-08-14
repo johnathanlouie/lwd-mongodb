@@ -103,13 +103,13 @@ class MongodbUrl {
 class MongodbClient {
 
   /** @type {ConfigFile} */
-  #config = null;
+  #config;
 
   /** @type {mongodb.MongoClient} */
-  #client = null;
+  #client;
 
   /** @type {mongodb.Db} */
-  #db = null;
+  #db;
 
   /**
    * Constructs the client.
