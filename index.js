@@ -112,6 +112,22 @@ class MongodbClient {
   #db = null;
 
   /**
+   * Constructs the client.
+   * 
+   * @param {ConfigFile} config Connection settings.
+   * @throws {Error}
+   */
+  constructor(config) {
+    this.#config = {
+      username: config.username ?? null,
+      password: config.password ?? null,
+      host: config.host ?? throwError('MongodbClient: Host not found in config'),
+      port: config.port ?? null,
+      database: config.database ?? throwError('MongodbClient: Database not found in config'),
+    };
+  }
+
+  /**
    * 
    * @param {string} filepath 
    */
