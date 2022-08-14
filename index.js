@@ -44,66 +44,10 @@ class IdFilter {
  * @property {?string} password
  * @property {string} host
  * @property {?number} port
- * @property {string} database
  */
 
 
-class MongodbUrl {
-
-  #username;
-  #password;
-  #hostname;
-  #port;
-  #database;
-
-  /**
-   * 
-   * @param {ConfigFile} config 
-   */
-  constructor(config) {
-    this.#username = config.username;
-    this.#password = config.password;
-    this.#hostname = config.hostname;
-    this.#port = config.port;
-    this.#database = config.database;
-  }
-
-  #credentialsUrl() {
-    if (this.#username && this.#password) {
-      return `${this.#username}:${this.#password}@`;
-    } else if (this.#username) {
-      return `${this.#username}@`;
-    } else {
-      return '';
-    }
-  }
-
-  #portUrl() {
-    if (this.#port) {
-      return `:${this.#port}`;
-    }
-    return '';
-  }
-
-  #url() {
-    return `${this.#credentialsUrl()}${this.#hostname}${this.#portUrl()}/${this.#database}`;
-  }
-
-  standardUrl() {
-    return `mongodb://${this.#url()}`;
-  }
-
-  dnsSrvUrl() {
-    return `mongodb+srv://${this.#url()}`;
-  }
-
-}
-
-
 class MongodbClient {
-
-  /** @type {ConfigFile} */
-  #config;
 
   /** @type {mongodb.MongoClient} */
   #client;
@@ -118,26 +62,27 @@ class MongodbClient {
    * @throws {Error}
    */
   constructor(config) {
-    this.#config = {
+    config = {
       username: config.username ?? null,
       password: config.password ?? null,
       host: config.host ?? throwError('MongodbClient: Host not found in config'),
       port: config.port ?? null,
-      database: config.database ?? throwError('MongodbClient: Database not found in config'),
     };
+    let url = MongodbClient.#createConnectionString(config);
+    this.#client = new mongodb.MongoClient(url);
   }
 
   /**
    * Loads a client from a configuration file.
    * 
    * @param {string} filepath 
-   * @returns {MongodbClient}
+   * @returns {Promise<MongodbClient>}
    * @throws {Error}
    */
   static async loadConfig(filepath) {
     let config = await fsPromises.readFile(filepath, { encoding: 'utf8' });
     config = JSON.parse(config);
-    return new this(config);
+    return new MongodbClient(config);
   }
 
   /**
@@ -153,20 +98,33 @@ class MongodbClient {
     return `mongodb://${auth}${config.host}${port}`;
   }
 
+  /**
+   * Connects to the MongoDB instance.
+   * 
+   * @returns {Promise<void>}
+   */
   async connect() {
-    this.#client = await mongodb.MongoClient.connect(new MongodbUrl(this.#config).standardUrl(), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    this.#db = this.#client.db();
+    await this.#client.connect();
   }
 
-  async close() {
-    if (this.#client !== null) {
-      await this.#client.close();
-      this.#client = null;
-      this.#db = null;
-    }
+  /**
+   * Closes the connection to the MongoDB instance.
+   * 
+   * @param {boolean} force Force close?
+   * @returns {Promise<void>}
+   */
+  async close(force) {
+    await this.#client.close(force);
+  }
+
+  /**
+   * Sets the database.
+   * 
+   * @param {string} name Name of the database.
+   * @returns {void}
+   */
+  setDb(name) {
+    this.#db = this.#client.db(name);
   }
 
   /**
