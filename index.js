@@ -92,35 +92,35 @@ class MongodbUrl {
 class MongodbClient {
 
   /** @type {MongodbConfig} */
-  static #config = null;
+  #config = null;
 
   /** @type {mongodb.MongoClient} */
-  static #client = null;
+  #client = null;
 
   /** @type {mongodb.Db} */
-  static #db = null;
+  #db = null;
 
   /**
    * 
    * @param {string} filepath 
    */
-  static readConfig(filepath) {
-    MongodbClient.#config = JSON.parse(fs.readFileSync(filepath));
+  readConfig(filepath) {
+    this.#config = JSON.parse(fs.readFileSync(filepath));
   }
 
-  static async connect() {
-    MongodbClient.#client = await mongodb.MongoClient.connect(new MongodbUrl(MongodbClient.#config).standardUrl(), {
+  async connect() {
+    this.#client = await mongodb.MongoClient.connect(new MongodbUrl(this.#config).standardUrl(), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    MongodbClient.#db = MongodbClient.#client.db();
+    this.#db = this.#client.db();
   }
 
-  static async close() {
-    if (MongodbClient.#client !== null) {
-      await MongodbClient.#client.close();
-      MongodbClient.#client = null;
-      MongodbClient.#db = null;
+  async close() {
+    if (this.#client !== null) {
+      await this.#client.close();
+      this.#client = null;
+      this.#db = null;
     }
   }
 
@@ -131,8 +131,8 @@ class MongodbClient {
    * @param {*} projection 
    * @returns 
    */
-  static async findOne(collection, query, projection) {
-    return await MongodbClient.#db.collection(collection).findOne(query, { projection: projection });
+  async findOne(collection, query, projection) {
+    return await this.#db.collection(collection).findOne(query, { projection: projection });
   }
 
   /**
@@ -142,8 +142,8 @@ class MongodbClient {
    * @param {*} projection 
    * @returns 
    */
-  static async findMany(collection, query, projection) {
-    return await MongodbClient.#db.collection(collection).find(query, { projection: projection }).toArray();
+  async findMany(collection, query, projection) {
+    return await this.#db.collection(collection).find(query, { projection: projection }).toArray();
   }
 
   /**
@@ -152,8 +152,8 @@ class MongodbClient {
    * @param {*} data 
    * @returns 
    */
-  static async insertOne(collection, data) {
-    return await MongodbClient.#db.collection(collection).insertOne(data);
+  async insertOne(collection, data) {
+    return await this.#db.collection(collection).insertOne(data);
   }
 
   /**
@@ -162,8 +162,8 @@ class MongodbClient {
    * @param {*} data 
    * @returns 
    */
-  static async insertMany(collection, data) {
-    return await MongodbClient.#db.collection(collection).insertMany(data);
+  async insertMany(collection, data) {
+    return await this.#db.collection(collection).insertMany(data);
   }
 
   /**
@@ -172,8 +172,8 @@ class MongodbClient {
    * @param {*} filter 
    * @returns 
    */
-  static async deleteOne(collection, filter) {
-    return await MongodbClient.#db.collection(collection).deleteOne(filter);
+  async deleteOne(collection, filter) {
+    return await this.#db.collection(collection).deleteOne(filter);
   }
 
   /**
@@ -182,10 +182,10 @@ class MongodbClient {
    * @param {*} document 
    * @returns 
    */
-  static async replaceOne(collection, document) {
+  async replaceOne(collection, document) {
     let filter = IdFilter.fromDocument(document);
     let noId = cloneNoId(document);
-    return await MongodbClient.#db.collection(collection).replaceOne(filter, noId);
+    return await this.#db.collection(collection).replaceOne(filter, noId);
   }
 
   /**
@@ -195,8 +195,8 @@ class MongodbClient {
    * @param {*} projection 
    * @returns 
    */
-  static getById(collection, id, projection) {
-    return MongodbClient.findOne(collection, IdFilter.fromHexString(id), projection);
+  getById(collection, id, projection) {
+    return this.findOne(collection, IdFilter.fromHexString(id), projection);
   }
 
   /**
@@ -205,8 +205,8 @@ class MongodbClient {
    * @param {string} id 
    * @returns 
    */
-  static deleteById(collection, id) {
-    return MongodbClient.deleteOne(collection, IdFilter.fromHexString(id));
+  deleteById(collection, id) {
+    return this.deleteOne(collection, IdFilter.fromHexString(id));
   }
 
 }
