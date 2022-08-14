@@ -102,14 +102,6 @@ class MongodbClient {
 
   /**
    * 
-   * @param {MongodbConfig} config 
-   */
-  static setConfig(config) {
-    MongodbClient.#config = config;
-  }
-
-  /**
-   * 
    * @param {string} filepath 
    */
   static readConfig(filepath) {
