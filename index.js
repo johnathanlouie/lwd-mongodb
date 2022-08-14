@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fsPromises = require('fs/promises');
 const mongodb = require('mongodb');
 
 
@@ -128,11 +128,16 @@ class MongodbClient {
   }
 
   /**
+   * Loads a client from a configuration file.
    * 
    * @param {string} filepath 
+   * @returns {MongodbClient}
+   * @throws {Error}
    */
-  readConfig(filepath) {
-    this.#config = JSON.parse(fs.readFileSync(filepath));
+  static async loadConfig(filepath) {
+    config = await fsPromises.readFile(filepath, { encoding: 'utf8' });
+    config = JSON.parse(config);
+    return new this(config);
   }
 
   async connect() {
