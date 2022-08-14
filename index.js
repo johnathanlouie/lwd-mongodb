@@ -31,7 +31,7 @@ class IdFilter {
  * @typedef {Object} ConfigFile
  * @property {?string} username
  * @property {?string} password
- * @property {string} hostname
+ * @property {string} host
  * @property {?number} port
  * @property {string} database
  */
