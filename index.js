@@ -2,6 +2,17 @@ const fs = require('fs');
 const mongodb = require('mongodb');
 
 
+/**
+ * Throws an error. Useful for nullish coalescing.
+ * 
+ * @param {?string} message Error message.
+ * @returns {void} Never returns.
+ * @throws {Error}
+ */
+function throwError(message = null) {
+  throw new Error(message ?? undefined);
+}
+
 function cloneNoId(document) {
   var newDoc = Object.assign({}, document);
   delete newDoc._id;
