@@ -140,6 +140,19 @@ class MongodbClient {
     return new this(config);
   }
 
+  /**
+   * Formats a connection string from a data object.
+   * 
+   * @param {ConfigFile} config 
+   * @returns {string} MongoDB connection string.
+   */
+  static #createConnectionString(config) {
+    let auth = config.password === null ? '' : `:${config.password}`;
+    auth = config.username === null ? '' : `${config.username}${auth}@`;
+    let port = config.port === null ? '' : `:${config.port}`;
+    return `mongodb://${auth}${config.host}${port}`;
+  }
+
   async connect() {
     this.#client = await mongodb.MongoClient.connect(new MongodbUrl(this.#config).standardUrl(), {
       useNewUrlParser: true,
