@@ -89,7 +89,7 @@ class MongodbUrl {
 }
 
 
-class Database {
+class MongodbClient {
 
   /** @type {MongodbConfig} */
   static #config = null;
@@ -105,7 +105,7 @@ class Database {
    * @param {MongodbConfig} config 
    */
   static setConfig(config) {
-    Database.#config = config;
+    MongodbClient.#config = config;
   }
 
   /**
@@ -113,22 +113,22 @@ class Database {
    * @param {string} filepath 
    */
   static readConfig(filepath) {
-    Database.#config = JSON.parse(fs.readFileSync(filepath));
+    MongodbClient.#config = JSON.parse(fs.readFileSync(filepath));
   }
 
   static async connect() {
-    Database.#client = await mongodb.MongoClient.connect(new MongodbUrl(Database.#config).standardUrl(), {
+    MongodbClient.#client = await mongodb.MongoClient.connect(new MongodbUrl(MongodbClient.#config).standardUrl(), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    Database.#db = Database.#client.db();
+    MongodbClient.#db = MongodbClient.#client.db();
   }
 
   static async close() {
-    if (Database.#client !== null) {
-      await Database.#client.close();
-      Database.#client = null;
-      Database.#db = null;
+    if (MongodbClient.#client !== null) {
+      await MongodbClient.#client.close();
+      MongodbClient.#client = null;
+      MongodbClient.#db = null;
     }
   }
 
@@ -140,7 +140,7 @@ class Database {
    * @returns 
    */
   static async findOne(collection, query, projection) {
-    return await Database.#db.collection(collection).findOne(query, { projection: projection });
+    return await MongodbClient.#db.collection(collection).findOne(query, { projection: projection });
   }
 
   /**
@@ -151,7 +151,7 @@ class Database {
    * @returns 
    */
   static async findMany(collection, query, projection) {
-    return await Database.#db.collection(collection).find(query, { projection: projection }).toArray();
+    return await MongodbClient.#db.collection(collection).find(query, { projection: projection }).toArray();
   }
 
   /**
@@ -161,7 +161,7 @@ class Database {
    * @returns 
    */
   static async insertOne(collection, data) {
-    return await Database.#db.collection(collection).insertOne(data);
+    return await MongodbClient.#db.collection(collection).insertOne(data);
   }
 
   /**
@@ -171,7 +171,7 @@ class Database {
    * @returns 
    */
   static async insertMany(collection, data) {
-    return await Database.#db.collection(collection).insertMany(data);
+    return await MongodbClient.#db.collection(collection).insertMany(data);
   }
 
   /**
@@ -181,7 +181,7 @@ class Database {
    * @returns 
    */
   static async deleteOne(collection, filter) {
-    return await Database.#db.collection(collection).deleteOne(filter);
+    return await MongodbClient.#db.collection(collection).deleteOne(filter);
   }
 
   /**
@@ -193,7 +193,7 @@ class Database {
   static async replaceOne(collection, document) {
     let filter = IdFilter.fromDocument(document);
     let noId = cloneNoId(document);
-    return await Database.#db.collection(collection).replaceOne(filter, noId);
+    return await MongodbClient.#db.collection(collection).replaceOne(filter, noId);
   }
 
   /**
@@ -204,7 +204,7 @@ class Database {
    * @returns 
    */
   static getById(collection, id, projection) {
-    return Database.findOne(collection, IdFilter.fromHexString(id), projection);
+    return MongodbClient.findOne(collection, IdFilter.fromHexString(id), projection);
   }
 
   /**
@@ -214,10 +214,10 @@ class Database {
    * @returns 
    */
   static deleteById(collection, id) {
-    return Database.deleteOne(collection, IdFilter.fromHexString(id));
+    return MongodbClient.deleteOne(collection, IdFilter.fromHexString(id));
   }
 
 }
 
 
-module.exports = Database;
+module.exports = MongodbClient;
