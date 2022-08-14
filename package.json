@@ -1,6 +1,6 @@
 {
-  "name": "@johnathanlouie/lwd-mongodb",
-  "version": "1.2.1",
+  "name": "@johnathanlouie/mongodb-client",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "Johnathan Louie",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "^3.3.0"
+    "mongodb": "3.7.3"
   },
-  "repository": "github:johnathanlouie/lwd-mongodb"
+  "repository": "github:johnathanlouie/mongodb-client"
 }
