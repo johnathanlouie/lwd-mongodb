@@ -28,7 +28,7 @@ class IdFilter {
 
 
 /**
- * @typedef {Object} MongodbConfig
+ * @typedef {Object} ConfigFile
  * @property {?string} username
  * @property {?string} password
  * @property {string} hostname
@@ -47,7 +47,7 @@ class MongodbUrl {
 
   /**
    * 
-   * @param {MongodbConfig} config 
+   * @param {ConfigFile} config 
    */
   constructor(config) {
     this.#username = config.username;
@@ -91,7 +91,7 @@ class MongodbUrl {
 
 class MongodbClient {
 
-  /** @type {MongodbConfig} */
+  /** @type {ConfigFile} */
   #config = null;
 
   /** @type {mongodb.MongoClient} */
