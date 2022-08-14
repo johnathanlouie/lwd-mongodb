@@ -1,2 +1,3 @@
-# lwd-mongodb
+# MongoDB Client
  
+NodeJS client for MongoDB.
