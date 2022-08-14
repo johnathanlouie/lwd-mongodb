@@ -135,7 +135,7 @@ class MongodbClient {
    * @throws {Error}
    */
   static async loadConfig(filepath) {
-    config = await fsPromises.readFile(filepath, { encoding: 'utf8' });
+    let config = await fsPromises.readFile(filepath, { encoding: 'utf8' });
     config = JSON.parse(config);
     return new this(config);
   }
