@@ -9,7 +9,7 @@
   "author": "Johnathan Louie",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "4.8.1"
+    "mongodb": "4.17.0"
   },
   "repository": "github:johnathanlouie/mongodb-client"
 }
